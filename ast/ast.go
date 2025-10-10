@@ -1,9 +1,12 @@
 package ast
 
+import "bytes"
+
 type Node interface {
 	// TokenLiteral returns the literal value of the token it’s associated with.
 	//will be used for testing and debugging only
 	TokenLiteral() string
+	String() string
 }
 
 type Statement interface {
@@ -27,4 +30,14 @@ func (p *Program) TokenLiteral() string {
 	} else {
 		return ""
 	}
+}
+
+func (p *Program) String() string {
+	var out bytes.Buffer // like Java's ByteBuffer
+
+	for _, s := range p.Statements {
+		out.WriteString(s.String())
+	}
+
+	return out.String()
 }
