@@ -41,14 +41,20 @@ func New(l *lexer.Lexer) *Parser {
 		errors: []string{},
 	}
 
-	p.prefixPraseFns = make(map[token.TokenType]prefixPraseFn)
-	p.registerPrefix(token.IDENT, p.parseIdentifier)
-	p.registerPrefix(token.INT, p.parseIntegerLiteral)
+	registerPrefixAndInfixFunctions(p)
 
 	p.nextToken()
 	p.nextToken()
 
 	return p
+}
+
+func registerPrefixAndInfixFunctions(p *Parser) {
+	p.prefixPraseFns = make(map[token.TokenType]prefixPraseFn)
+	p.registerPrefix(token.IDENT, p.parseIdentifier)
+	p.registerPrefix(token.INT, p.parseIntegerLiteral)
+	p.registerPrefix(token.BANG, p.parsePrefixExpression)
+	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 }
 
 func (p *Parser) Errors() []string {
@@ -94,6 +100,21 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	lit.Value = value
 
 	return lit
+}
+
+// parsePrefixExpression first read the current token which is ! or - then advances to the next token and consumes that
+// as an expression
+func (p *Parser) parsePrefixExpression() ast.Expression {
+	expression := &ast.PrefixExpression{
+		Token:    p.curToken,
+		Operator: p.curToken.Literal,
+	}
+
+	p.nextToken()
+
+	expression.Right = p.parseExpression(PREFIX)
+
+	return expression
 }
 
 // STATEMENTS
@@ -155,6 +176,7 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := p.prefixPraseFns[p.curToken.Type]
 	if prefix == nil {
+		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
 
@@ -194,6 +216,11 @@ func (p *Parser) nextToken() {
 
 func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixPraseFn) {
 	p.prefixPraseFns[tokenType] = fn
+}
+
+func (p *Parser) noPrefixParseFnError(t token.TokenType) {
+	msg := fmt.Sprintf("no prefix parse function for %s found", t)
+	p.errors = append(p.errors, msg)
 }
 
 func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
