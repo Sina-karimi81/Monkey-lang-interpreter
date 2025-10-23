@@ -84,8 +84,8 @@ This interpreter is built by following:
 ---
 🛠️ Future Work
 
-- [ ] Add built-in functions to type
-- [ ] Add support for arrays
+- [x] Add built-in functions to type
+- [x] Add support for arrays
 - [ ] Add support for hashes/objects
 - [ ] Add support for interpreting files
 - [ ] complete the standard library
