@@ -24,6 +24,12 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		line := scanner.Text() // returns what was read in Scan()
+
+		if line == "exit" {
+			_, _ = io.WriteString(out, "good bye!!!!")
+			return
+		}
+
 		l := lexer.New(line)
 		p := parser.New(l)
 
