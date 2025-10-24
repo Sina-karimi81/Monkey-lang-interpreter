@@ -86,7 +86,7 @@ This interpreter is built by following:
 
 - [x] Add built-in functions to type
 - [x] Add support for arrays
-- [ ] Add support for hashes/objects
+- [x] Add support for hashes/objects
 - [ ] Add support for interpreting files
 - [ ] complete the standard library
 - [ ] improve error handling
